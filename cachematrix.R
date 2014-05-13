@@ -5,17 +5,21 @@
 ##
 ## x is a matrix that defaults to an empty matrix.
 makeCacheMatrix <- function(x = matrix()) {
-    i <- NULL
+    cachedInverse <- NULL
     set <- function(y) {
         x <<- y
-        i <<- NULL
+        cachedInverse <<- NULL
     }
-    get <- function() x
-    setinverse <- function(inverse) i <<- inverse
-    getinverse <- function() i
-    list(set = set, get = get,
-         setinverse = setinverse,
-         getinverse = getinverse)
+    get <- function() { x }
+    setinverse <- function(inverse) { cachedInverse <<- inverse }
+    getinverse <- function() { cachedInverse }
+    hasinverse <- function() { !is.null(cachedInverse) }
+    
+    list(set = set, 
+         get = get, 
+         setinverse = setinverse, 
+         getinverse = getinverse, 
+         hasinverse=hasinverse)
 }
 
 ## Returns a matrix that is the inverse of 'x'
@@ -25,10 +29,9 @@ makeCacheMatrix <- function(x = matrix()) {
 ## If the inverse has already been calculated (and the matrix has not changed), 
 ## then the cachesolve will retrieve the inverse from the cache
 cacheSolve <- function(x, ...) {
-    m <- x$getinverse()
-    if(!is.null(m)) {
+    if(x$hasinverse()) {
         message("getting cached data")
-        return(m)
+        return(x$getinverse())
     } else {
         data <- x$get()
         m <- solve(data, ...)
